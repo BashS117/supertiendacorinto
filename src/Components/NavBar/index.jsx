@@ -15,11 +15,11 @@ const NavBar = () => {
   ];
 
   return (
-    <div className="flex items-center gap-4 p-4 bg-green-100">
+    <div className="flex items-center gap-4 p-4 bg-blue-900">
       {/* Botón Todas las Categorías */}
       <div className="relative">
         <button
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+          className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700"
           onClick={() => setShowCategories(!showCategories)}
         >
           <svg
