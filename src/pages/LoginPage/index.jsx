@@ -1,17 +1,29 @@
 import React,{useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../redux/slices/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const { isLoading, error } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const { isLoading, error,user } = useSelector((state) => state.auth);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(loginUser({ email, password }));
   };
+   // Redirige al usuario después de iniciar sesión correctamente
+   React.useEffect(() => {
+    if (user) {
+      if (user.role === "cliente") {
+        navigate("/"); // Redirige al home
+      } else if (user.role === "admin") {
+        navigate("/admin-productos"); // Redirige a la página de administrador
+      }
+    }
+  }, [user, navigate]);
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
@@ -21,7 +33,7 @@ const LoginPage = () => {
         </h2>
         {error && <p className="text-red-500 text-center">{error}</p>}
         {/* Formulario */}
-        <form>
+        <form onSubmit={handleSubmit}>
           {/* Campo de correo electrónico */}
           <div className="mb-4">
             <label
@@ -82,7 +94,7 @@ const LoginPage = () => {
           {/* Enlace para registrarse */}
         <div className="mt-4 text-center">
           <a
-            href="/forgot-password"
+            href="/signup"
             className="text-sm text-blue-500 hover:underline"
           >
             ¿No tienes una cuenta? Regístrate

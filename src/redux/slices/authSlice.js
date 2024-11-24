@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase/firebase.js";
+import { doc, setDoc,getDoc } from "firebase/firestore"; // Importar funciones de Firestore
+import { auth,db } from "../../firebase/firebase.js";
 
 // Thunk para manejar la autenticación
 export const loginUser = createAsyncThunk(
@@ -9,7 +10,21 @@ export const loginUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return userCredential.user; // Devuelve la información del usuario
+      const user = userCredential.user;
+       // Lee el rol del usuario desde Firestore
+       const docRef = doc(db, "users", user.uid);
+       const docSnap = await getDoc(docRef);
+ 
+       if (!docSnap.exists()) {
+         throw new Error("El usuario no tiene datos en Firestore");
+       }
+ 
+       const userData = docSnap.data();
+      
+      // return userCredential.user; // Devuelve la información del usuario
+console.log(userData.role)
+     // Retorna los datos del usuario incluyendo el rol
+      return { uid: user.uid, email: user.email, role: userData.role };
     } catch (error) {
       return rejectWithValue(error.message); // Maneja errores
     }
@@ -21,11 +36,21 @@ export const registerUser = createAsyncThunk(
     "auth/registerUser",
     async ({ email, password }, { rejectWithValue }) => {
       try {
+        
+        //Crear el usuario en fb auth
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const { uid, email: userEmail,role } = userCredential.user;
+
+        // Guardar la información del usuario en Firestore con el rol 'cliente'
+      await setDoc(doc(db, "users", uid), {
+        email: email,
+        role: "cliente", // Asignar rol por defecto
+        createdAt: new Date().toISOString(),
+      });
+
         // return userCredential.user; // Devuelve la información del usuario registrado
               // Solo retornamos los datos relevantes
-      const { uid, email: userEmail } = userCredential.user;
-      return { uid, email: userEmail }; // Esto es serializable
+      return { uid, email: userEmail,role }; // Esto es serializable
       } catch (error) {
         return rejectWithValue(error.message); // Maneja errores
       }

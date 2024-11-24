@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../../redux/slices/authSlice";
-
+import {  useNavigate } from "react-router-dom";
 const SignUpPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -9,6 +9,10 @@ const SignUpPage = () => {
   const dispatch = useDispatch();
   const { isLoading, error } = useSelector((state) => state.auth);
 
+
+     // navigate 
+     const navigate = useNavigate();
+     
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -18,6 +22,7 @@ const SignUpPage = () => {
     }
 
     dispatch(registerUser({ email, password }));
+    navigate('/Login')
   };
 
   return (
