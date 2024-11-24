@@ -23,6 +23,7 @@ export const loginUser = createAsyncThunk(
       
       // return userCredential.user; // Devuelve la información del usuario
 console.log(userData.role)
+localStorage.setItem("users", JSON.stringify(user) )
      // Retorna los datos del usuario incluyendo el rol
       return { uid: user.uid, email: user.email, role: userData.role };
     } catch (error) {
