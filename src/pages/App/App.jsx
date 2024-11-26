@@ -6,6 +6,7 @@ import LoginPage from "../LoginPage"
 import SignUpPage from "../SignUp"
 import { ProtectedRouteForAdmin } from "../../Components/ProtectedRouteAdmin"
 import './App.css'
+import AdminProductsPage from "../Admin"
 
 
 const AppRoutes=()=>{
@@ -13,7 +14,7 @@ const AppRoutes=()=>{
     {path: '/', element :<Home/>},
     {path: '/login', element :<LoginPage/>},
     {path: '/signup', element :<SignUpPage/>},
-    {path: '/admin-productos', element :<ProtectedRouteForAdmin>ADMIN</ProtectedRouteForAdmin>},
+    {path: '/admin-productos', element :<ProtectedRouteForAdmin><AdminProductsPage/></ProtectedRouteForAdmin>},
  
   ])
   return routes;
