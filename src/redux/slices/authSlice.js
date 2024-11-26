@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword,signOut } from "firebase/auth";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc,getDoc } from "firebase/firestore"; // Importar funciones de Firestore
 import { auth,db } from "../../firebase/firebase.js";
@@ -23,7 +23,8 @@ export const loginUser = createAsyncThunk(
       
       // return userCredential.user; // Devuelve la información del usuario
 console.log(userData.role)
-localStorage.setItem("users", JSON.stringify(user) )
+localStorage.setItem("user", JSON.stringify({ uid: user.uid, email: user.email, role: userData.role }));
+
      // Retorna los datos del usuario incluyendo el rol
       return { uid: user.uid, email: user.email, role: userData.role };
     } catch (error) {
@@ -61,13 +62,14 @@ export const registerUser = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: null,
+    user: JSON.parse(localStorage.getItem("user")) || null,
     isLoading: false,
     error: null,
   },
   reducers: {
     logout: (state) => {
       state.user = null;
+      localStorage.removeItem("user");
     },
   },
   extraReducers: (builder) => {
@@ -80,6 +82,7 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;// `payload` ahora es serializable
+        localStorage.setItem("user", JSON.stringify(action.payload));
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
