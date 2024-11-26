@@ -1,24 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { createProduct, editProduct } from "../../redux/slices/productSlice";
 
-const ProductModal = ({ isOpen, onClose, onSubmit, product }) => {
+const ProductModal = ({ isOpen, onClose, product }) => {
   const [formValues, setFormValues] = useState({
-    name: product?.name || "",
-    price: product?.price || "",
-    stock: product?.stock || "",
+    name: "",
+    price: "",
+    stock: "",
+    category: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (product) {
+      setFormValues({
+        name: product.name,
+        price: product.price,
+        stock: product.stock,
+        category: product.category,
+      });
+    }
+  }, [product]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formValues); // Llama a la función de envío con los datos del formulario
-    onClose(); // Cierra el modal
+    setIsSubmitting(true);
+
+    const productData = {
+      name: formValues.name,
+      price: parseFloat(formValues.price),
+      stock: parseInt(formValues.stock),
+      category: formValues.category,
+    };
+
+    try {
+      if (product) {
+        // Editar producto existente
+        await dispatch(editProduct({ id: product.id, updatedData: productData })).unwrap();
+      } else {
+        // Crear un nuevo producto
+        await dispatch(createProduct(productData)).unwrap();
+      }
+      onClose();
+    } catch (error) {
+      console.error("Error al guardar el producto:", error);
+      alert("Hubo un error al guardar el producto.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  if (!isOpen) return null; // Si el modal no está abierto, no renderiza nada
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -73,19 +111,36 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product }) => {
             />
           </div>
 
+          <div className="mb-4">
+            <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+              Categoría
+            </label>
+            <input
+              type="text"
+              id="category"
+              name="category"
+              value={formValues.category}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+
           <div className="flex justify-end gap-4">
             <button
               type="button"
               onClick={onClose}
               className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition"
+              disabled={isSubmitting}
             >
               Cancelar
             </button>
             <button
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+              disabled={isSubmitting}
             >
-              {product ? "Guardar Cambios" : "Añadir Producto"}
+              {isSubmitting ? "Guardando..." : product ? "Guardar Cambios" : "Añadir Producto"}
             </button>
           </div>
         </form>
