@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProductModal from "../../Components/ProductModal";
-
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProducts } from "../../redux/slices/productSlice"; 
 const AdminProductsPage = () => {
-  const [products, setProducts] = useState([
-    { id: 1, name: "Producto A", price: 10, stock: 20 },
-    { id: 2, name: "Producto B", price: 15, stock: 10 },
-    { id: 3, name: "Producto C", price: 20, stock: 5 },
-  ]);
+    const dispatch = useDispatch();
+    const { items: products, isLoading, error } = useSelector((state) => state.products);
+console.log(products)
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+
+  useEffect(() => {
+    dispatch(fetchProducts()); // Despacha la acción al cargar la página
+  }, [dispatch]);
 
   const handleAddProduct = (product) => {
     const newProduct = { id: Date.now(), ...product }; // Genera un ID único
@@ -60,6 +63,7 @@ const AdminProductsPage = () => {
         <thead className="bg-blue-700 text-white">
           <tr>
             <th className="py-2 px-4 text-left">ID</th>
+            <th className="py-2 px-4 text-left">#</th>
             <th className="py-2 px-4 text-left">Nombre</th>
             <th className="py-2 px-4 text-left">Precio</th>
             <th className="py-2 px-4 text-left">Stock</th>
@@ -67,12 +71,13 @@ const AdminProductsPage = () => {
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
+          {products.map((product,index) => (
             <tr
               key={product.id}
               className="border-b hover:bg-gray-100 transition"
             >
               <td className="py-2 px-4">{product.id}</td>
+              <td className="py-2 px-4">{index+1}</td>
               <td className="py-2 px-4">{product.name}</td>
               <td className="py-2 px-4">${product.price}</td>
               <td className="py-2 px-4">{product.stock}</td>
