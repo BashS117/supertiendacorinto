@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { collection, doc, setDoc, updateDoc, getDocs } from "firebase/firestore";
+import { collection, doc, deleteDoc, setDoc, updateDoc, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 
 // AsyncThunk para cargar productos desde Firestore
@@ -37,6 +37,21 @@ export const editProduct = createAsyncThunk("products/editProduct", async ({ id,
   }
 });
 
+
+// AsyncThunk para eliminar un producto
+export const deleteProduct = createAsyncThunk(
+    "products/deleteProduct",
+    async (productId, { rejectWithValue }) => {
+      try {
+        const productRef = doc(db, "products", productId);
+        await deleteDoc(productRef);
+        return productId
+      } catch (error) {
+        return rejectWithValue(error.message);
+      }
+    }
+  );
+
 const productSlice = createSlice({
   name: "products",
   initialState: {
@@ -47,6 +62,7 @@ const productSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+    
       // Fetch Products
       .addCase(fetchProducts.pending, (state) => {
         state.isLoading = true;
@@ -77,7 +93,15 @@ const productSlice = createSlice({
       })
       .addCase(editProduct.rejected, (state, action) => {
         state.error = action.payload;
-      });
+      })
+        // Eliminar producto
+        .addCase(deleteProduct.fulfilled, (state, action) => {
+            state.items = state.items.filter((product) => product.id !== action.payload);
+          })
+          .addCase(deleteProduct.rejected, (state, action) => {
+            state.error = action.payload;
+          })
+      
   },
 });
 

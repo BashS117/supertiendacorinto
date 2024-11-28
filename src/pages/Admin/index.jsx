@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ProductModal from "../../Components/ProductModal";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts } from "../../redux/slices/productSlice"; 
+import { fetchProducts,deleteProduct } from "../../redux/slices/productSlice"; 
 const AdminProductsPage = () => {
     const dispatch = useDispatch();
     const { items: products, isLoading, error } = useSelector((state) => state.products);
@@ -13,17 +13,12 @@ console.log(products)
     dispatch(fetchProducts()); // Despacha la acción al cargar la página
   }, [dispatch]);
 
-  const handleAddProduct = (product) => {
-    const newProduct = { id: Date.now(), ...product }; // Genera un ID único
-    setProducts((prev) => [...prev, newProduct]);
-  };
-
-  const handleEditProduct = (updatedProduct) => {
-    setProducts((prev) =>
-      prev.map((product) =>
-        product.id === editingProduct.id ? { ...product, ...updatedProduct } : product
-      )
-    );
+  const handleDeleteProduct =(productId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this product?");
+    if (confirmDelete) {
+        console.log(productId)
+       dispatch(deleteProduct(productId));
+    }
   };
 
   const openAddModal = () => {
@@ -35,15 +30,6 @@ console.log(products)
     setEditingProduct(product);
     setModalOpen(true);
   };
-
-  const handleModalSubmit = (formValues) => {
-    if (editingProduct) {
-      handleEditProduct(formValues);
-    } else {
-      handleAddProduct(formValues);
-    }
-  };
-
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold mb-6 text-center text-blue-700">
@@ -88,7 +74,9 @@ console.log(products)
                 >
                   Editar
                 </button>
-                <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
+                <button
+                onClick={() => handleDeleteProduct(product.id)}
+                 className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
                   Eliminar
                 </button>
               </td>
@@ -100,7 +88,7 @@ console.log(products)
       <ProductModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSubmit={handleModalSubmit}
+      
         product={editingProduct}
       />
     </div>

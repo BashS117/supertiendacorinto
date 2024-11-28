@@ -3,6 +3,16 @@ import { useDispatch } from "react-redux";
 import { createProduct, editProduct } from "../../redux/slices/productSlice";
 
 const ProductModal = ({ isOpen, onClose, product }) => {
+    const categories = [
+        "Despensa",
+        "Lácteos, huevos y refrigerados",
+        "Dulces y postres",
+        "Vinos y licores",
+        "Bebidas",
+        "Aseo del hogar",
+        "Cuidado personal",
+        "Limpieza de cocina",
+      ];
   const [formValues, setFormValues] = useState({
     name: "",
     price: "",
@@ -111,19 +121,28 @@ const ProductModal = ({ isOpen, onClose, product }) => {
             />
           </div>
 
-          <div className="mb-4">
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-              Categoría
+         {/* Category Dropdown */}
+         <div className="mb-4">
+            <label htmlFor="category" className="block text-sm font-medium">
+              Category
             </label>
-            <input
-              type="text"
+            <select
               id="category"
               name="category"
               value={formValues.category}
               onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full border px-3 py-2 rounded"
               required
-            />
+            >
+              <option value="" disabled>
+                Select a category
+              </option>
+              {categories.map((category, index) => (
+                <option key={index} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="flex justify-end gap-4">
