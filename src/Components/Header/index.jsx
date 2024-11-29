@@ -1,5 +1,6 @@
 import React,{useState} from "react";
 import {  useSelector } from "react-redux";
+import { Link } from "react-router-dom"; // Importa Link
 import UserDropdown from "../userDropDown";
 import './Header.css'
 
@@ -14,13 +15,17 @@ const Header = () => {
     <header className="flex items-center justify-between bg-blue-700 p-4 text-white">
       {/* Logo */}
       <div className="text-lg font-bold text-yellow-400">
+        <Link to='/home'>
+      
         <figure>
           <img
+          
             className="w-[100px] h-[100px] rounded-lg logo"
             src="https://mir-s3-cdn-cf.behance.net/project_modules/1400_opt_1/7eb3ef213001447.673eb4aa541ed.png"
             alt=""
           />
         </figure>
+        </Link>
       </div>
 
       <div className="flex items-center w-full max-w-2xl  rounded-lg overflow-hidden shadow-md">

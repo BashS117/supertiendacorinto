@@ -7,11 +7,13 @@ import SignUpPage from "../SignUp"
 import { ProtectedRouteForAdmin } from "../../Components/ProtectedRouteAdmin"
 import './App.css'
 import AdminProductsPage from "../Admin"
+import HomePage from "../HomePage"
 
 
 const AppRoutes=()=>{
   let routes=useRoutes([
     {path: '/', element :<Home/>},
+    {path: '/home', element :<HomePage/>},
     {path: '/login', element :<LoginPage/>},
     {path: '/signup', element :<SignUpPage/>},
     {path: '/admin-productos', element :<ProtectedRouteForAdmin><AdminProductsPage/></ProtectedRouteForAdmin>},
