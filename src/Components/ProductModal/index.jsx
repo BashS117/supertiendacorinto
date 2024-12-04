@@ -18,6 +18,8 @@ const ProductModal = ({ isOpen, onClose, product }) => {
     price: "",
     stock: "",
     category: "",
+    isOnSale: false,
+    salePrice: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const dispatch = useDispatch();
@@ -29,24 +31,37 @@ const ProductModal = ({ isOpen, onClose, product }) => {
         price: product.price,
         stock: product.stock,
         category: product.category,
+        isOnSale: product?.isOnSale || false,
+        salePrice: product?.salePrice || "",
       });
     }
   }, [product]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormValues((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormValues({
+      ...formValues,
+      [name]: type === "checkbox" ? checked : value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
+     // Validar datos antes de enviar
+     if (formValues.isOnSale && (!formValues.salePrice || formValues.salePrice <= 0)) {
+      alert("Por favor, ingresa un precio válido para la oferta.");
+      return;
+    }
+
     const productData = {
       name: formValues.name,
       price: parseFloat(formValues.price),
       stock: parseInt(formValues.stock),
       category: formValues.category,
+      isOnSale: formValues.isOnSale,
+      salePrice:  parseFloat(formValues.salePrice),
     };
 
     try {
@@ -106,6 +121,30 @@ const ProductModal = ({ isOpen, onClose, product }) => {
             />
           </div>
 
+          <div className="mb-4">
+          <label className=" text-gray-700 flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="isOnSale" 
+              checked={formValues.isOnSale}
+              onChange={handleChange}
+            />
+            ¿Producto en oferta?
+          </label>
+        </div>
+        {formValues.isOnSale && (
+          <div className="mb-4">
+            <label className="block text-gray-700">Precio de Oferta</label>
+            <input
+              type="number"
+              name="salePrice"
+              value={formValues.salePrice}
+              onChange={handleChange}
+              className="w-full border rounded-lg p-2"
+              required
+            />
+          </div>
+        )}
           <div className="mb-4">
             <label htmlFor="stock" className="block text-sm font-medium text-gray-700">
               Stock
